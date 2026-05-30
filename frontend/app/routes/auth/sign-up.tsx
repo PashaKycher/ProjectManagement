@@ -6,8 +6,10 @@ import type z from 'zod'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
+import { useSignUpMutation } from '@/hooks/use-auth'
+import { toast } from 'sonner'
 
-type SignUpFormData = z.infer<typeof signUpSchema>
+export type SignUpFormData = z.infer<typeof signUpSchema>
 
 const SignUp = () => {
   const form = useForm<SignUpFormData>({
@@ -19,8 +21,19 @@ const SignUp = () => {
       confirmPassword: '',
     },
   })
+
+  const {mutate, isPending} = useSignUpMutation();
+
   const handleOnSubmit = (values: SignUpFormData) => {
-    console.log(values)
+    mutate(values, {
+      onSuccess: () => {
+        toast.success('Реєстрація успішна! Тепер ви можете увійти в свій акаунт.');
+      },
+      onError: (error: any) => {
+        const message = error?.response?.data?.message || 'Щось пішло не так. Спробуйте ще раз.';
+        toast.error(message);
+      }
+    });
   }
 
   return (
@@ -91,7 +104,9 @@ const SignUp = () => {
                   </FormItem>
                 )}
               />
-              <Button type='submit' className='w-full mt-4'>Зареєструватися</Button>
+              <Button type='submit' className='w-full mt-4' disabled={isPending}>
+                {isPending ? 'Зареєстрування...' : 'Зареєструватися'}
+              </Button>
             </form>
           </Form>
 
