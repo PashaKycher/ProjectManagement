@@ -6,20 +6,37 @@ import type z from 'zod'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
+import { useLoginMutation } from '@/hooks/use-auth'
+import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 
 type SignInFormData = z.infer<typeof signInSchema>
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const form = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: '',
       password: '',
     },
-  })
+  });
+
+  const { mutate, isPending} = useLoginMutation();
   const handleOnSubmit = (values: SignInFormData) => {
-    console.log(values)
+    mutate(values, {
+          onSuccess: () => {
+            toast.success("Успішний вхід", { description: "Логін та пароль успішно пройшли перевірку." });
+            form.reset()
+            navigate('/dashboard')
+          },
+          onError: (error: any) => {
+            const message = error?.response?.data?.message || 'Щось пішло не так. Спробуйте ще раз.';
+            toast.error(message);
+            console.log("Login error:", error);
+          }
+        });
   }
 
   return (
@@ -65,7 +82,9 @@ const SignIn = () => {
                   </FormItem>
                 )}
               />
-              <Button type='submit' className='w-full mt-4'>Увійти</Button>
+              <Button type='submit' className='w-full mt-4' disabled={isPending}>
+                {isPending ? (<Loader2 className='mr-2 h-4 w-4 animate-spin' />) : 'Увійти'}
+              </Button>
             </form>
           </Form>
 

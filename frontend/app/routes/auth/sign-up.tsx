@@ -8,10 +8,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Button } from '@/components/ui/button'
 import { useSignUpMutation } from '@/hooks/use-auth'
 import { toast } from 'sonner'
+import { useNavigate } from 'react-router'
 
 export type SignUpFormData = z.infer<typeof signUpSchema>
 
 const SignUp = () => {
+  const { mutate, isPending } = useSignUpMutation();
+  const navigate = useNavigate();
+  
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -22,16 +26,17 @@ const SignUp = () => {
     },
   })
 
-  const {mutate, isPending} = useSignUpMutation();
-
   const handleOnSubmit = (values: SignUpFormData) => {
     mutate(values, {
       onSuccess: () => {
-        toast.success('Реєстрація успішна! Тепер ви можете увійти в свій акаунт.');
+        toast.success("Реєстрація успішна", { description: "На вашу електронну пошту було надіслано лист з посиланням для підтвердження. Будь ласка, перевірте свою пошту та підтвердіть email, щоб завершити реєстрацію." });
+        form.reset()
+        navigate('/sign-in')
       },
       onError: (error: any) => {
         const message = error?.response?.data?.message || 'Щось пішло не так. Спробуйте ще раз.';
         toast.error(message);
+        console.log("Registration error:", error);
       }
     });
   }
