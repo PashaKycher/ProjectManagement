@@ -11,4 +11,8 @@ const loginSchema = z.object({
   password: z.string().min(6, "Пароль повинен містити принаймні 6 символів"),
 });
 
-export { registerSchema, loginSchema };
+const verifyEmailSchema = z.object({
+  token: z.string().min(1, "Токен верифікації обов'язковий"),
+});
+
+export { registerSchema, loginSchema, verifyEmailSchema };
