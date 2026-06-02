@@ -4,11 +4,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type z from 'zod'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { useSignUpMutation } from '@/hooks/use-auth'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router'
+import { Input } from '@/components/ui/input'
 
 export type SignUpFormData = z.infer<typeof signUpSchema>
 
@@ -59,10 +60,9 @@ const SignUp = () => {
                   <FormItem>
                     <FormLabel>Ваше ім'я</FormLabel>
                     <FormControl>
-                      <input className='border border-input bg-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
-                          focus-visible:ring-ring focus-visible:ring-offset-2 focus:border-white'
-                        type='text' placeholder='Іван Іваненко' {...field} />
+                      <Input type='text' placeholder='Іван Іваненко' {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -73,11 +73,9 @@ const SignUp = () => {
                   <FormItem>
                     <FormLabel>Ваша електронна пошта</FormLabel>
                     <FormControl>
-                      <input
-                        className='border border-input bg-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
-                          focus-visible:ring-ring focus-visible:ring-offset-2 focus:border-white'
-                        type='email' placeholder='email@example.com' {...field} />
+                      <Input type='email' placeholder='email@example.com' {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -88,10 +86,9 @@ const SignUp = () => {
                   <FormItem>
                     <FormLabel>Ваш пароль</FormLabel>
                     <FormControl>
-                      <input className='border border-input bg-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
-                          focus-visible:ring-ring focus-visible:ring-offset-2 focus:border-white'
-                        type='password' placeholder='qwerty' {...field} />
+                      <Input type='password' placeholder='qwerty' {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -102,10 +99,9 @@ const SignUp = () => {
                   <FormItem>
                     <FormLabel>Підтвердіть пароль</FormLabel>
                     <FormControl>
-                      <input className='border border-input bg-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
-                          focus-visible:ring-ring focus-visible:ring-offset-2 focus:border-white'
-                        type='password' placeholder='qwerty' {...field} />
+                      <Input type='password' placeholder='qwerty' {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

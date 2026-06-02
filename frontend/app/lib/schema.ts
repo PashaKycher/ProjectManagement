@@ -10,5 +10,13 @@ export const signUpSchema = z.object({
   email: z.string().email("Невірний формат електронної пошти"),
   password: z.string().min(6, "Пароль повинен містити принаймні 6 символів"),
   confirmPassword: z.string().min(6, "Пароль повинен містить принаймні 6 символів"),
-})
-  .refine((data) => data.password === data.confirmPassword, { message: "Паролі не співпадають", path: ["confirmPassword"] });
+}).refine((data) => data.password === data.confirmPassword, { message: "Паролі не співпадають", path: ["confirmPassword"] });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Невірний формат електронной почты"),
+});
+
+export const resetPasswordSchema = z.object({
+  newPassword: z.string().min(6, "Пароль повинен містить принаймні 6 символів"),
+  confirmNewPassword: z.string().min(6, "Пароль повинен містить принаймні 6 символів"),
+}).refine((data) => data.newPassword === data.confirmNewPassword, { message: "Паролі не співпадают", path: ["confirmNewPassword"] });

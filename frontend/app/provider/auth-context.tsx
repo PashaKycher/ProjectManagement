@@ -9,7 +9,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
-    login: (email: string, password: string) => Promise<void>;
+    login: (data: any) => Promise<void>;
     logout: () => void;
 }
 
@@ -64,6 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
         setIsAuthenticated(false);
         queryClient.clear();
+        navigate('/sign-in');
     }
 
     const values: AuthContextType = {

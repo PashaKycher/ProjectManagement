@@ -22,7 +22,7 @@ const verificationCreate = async (id, email) => {
     }
 };
 
-const registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
@@ -55,7 +55,7 @@ const registerUser = async (req, res) => {
     }
 };
 
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -100,7 +100,7 @@ const loginUser = async (req, res) => {
     }
 };
 
-const verifyEmail = async (req, res) => {
+export const verifyEmail = async (req, res) => {
     try {
         const { token } = req.body;
 
@@ -144,4 +144,94 @@ const verifyEmail = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser, verifyEmail };
+export const resetPasswordRequest = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ success: false, error: true, message: "Користувача не знайдено", });
+        }
+
+        if (!user.isEmailVerified) {
+            return res.status(400).json({ success: false, error: true, message: "Будь ласка, підтвердіть свою електронну адресу перед скиданням пароля", });
+            const existingVerification = await Verification.findOne({ userId: user._id });
+            if (existingVerification) {
+                if (existingVerification.expiresAt > new Date()) {
+                    return res.status(400).json({ success: false, error: true, message: "Будь ласка, підтвердіть свою електронну адресу. Лист для верифікації вже надіслано", });
+                } else {
+                    await Verification.findByIdAndDelete(existingVerification._id);
+                    await verificationCreate(user._id, user.email);
+                    return res.status(400).json({ success: false, error: true, message: "Будь ласка, підтвердіть свою електронну адресу. Лист для верифікації надіслано повторно", });
+                }
+            } else {
+                await verificationCreate(user._id, user.email);
+                return res.status(400).json({ success: false, error: true, message: "Будь ласка, підтвердіть свою електронну адресу. Лист для верифікації надіслано повторно", });
+            }
+        }
+
+        const resetPasswordToken = await jwt.sign({ userId: user._id, purpose: "password-reset" }, process.env.JWT_SECRET, { expiresIn: "15m" });
+        await Verification.create({ userId: user._id, token: resetPasswordToken, expiresAt: new Date(Date.now() + 15 * 60 * 1000), });
+
+        const resetPasswordLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetPasswordToken}`;
+        const emailBody = `
+            Будь ласка, натисніть на посилання нижче, щоб скинути свій пароль:
+            <a href="${resetPasswordLink}">${resetPasswordLink}</a>
+        `;
+        const emailSubject = "Скидання пароля";
+        const emailSent = await sendEmail(email, emailSubject, emailBody);
+        if (!emailSent) {
+            return res.status(500).json({ success: false, error: true, message: "Не вдалося надіслати лист для скидання пароля", });
+        }
+
+        return res.status(200).json({ success: true, error: false, message: "Лист для скидання пароля надіслано", });
+    } catch (error) {
+        console.error("auth-controller - resetPassword:", error);
+        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так", });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword, confirmNewPassword } = req.body;
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        if (!payload) {
+            return res.status(400).json({ success: false, error: true, message: "Невірний токен", });
+        }
+
+        const { userId, purpose } = payload;
+        if (purpose !== "password-reset") {
+            return res.status(400).json({ success: false, error: true, message: "Невірне значення ключа 'purpose'", });
+        }
+
+        const verificationRecord = await Verification.findOne({ userId, token });
+        if (!verificationRecord) {
+            return res.status(400).json({ success: false, error: true, message: "Немає заявки на скидання пароля", });
+        }
+
+        const isTokenExpired = verificationRecord.expiresAt < new Date();
+        if (isTokenExpired) {
+            return res.status(400).json({ success: false, error: true, message: "Токен для скидання пароля закінчився", });
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({ success: false, error: true, message: "Пароли не совпадают", });
+        }
+
+        const user = await User.findById(userId).select("+password");
+        if (!user) {
+            return res.status(400).json({ success: false, error: true, message: "Користувача не знайдено", });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        user.password = hashedPassword;
+        await user.save();
+
+        await Verification.findByIdAndDelete(verificationRecord._id);
+
+        return res.status(200).json({ success: true, error: false, message: "Пароль успішно скинуто", });
+    } catch (error) {
+        console.error("auth-controller - resetPassword:", error);
+        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так", });
+    }
+};

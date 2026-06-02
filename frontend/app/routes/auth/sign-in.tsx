@@ -1,20 +1,25 @@
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { signInSchema } from '@/lib/schema'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type z from 'zod'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
-import { Button } from '@/components/ui/button'
 import { Link, useNavigate } from 'react-router'
 import { useLoginMutation } from '@/hooks/use-auth'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
+import { useAuth } from '@/provider/auth-context'
+import { Input } from '@/components/ui/input'
 
 type SignInFormData = z.infer<typeof signInSchema>
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const { mutate, isPending } = useLoginMutation();
+  const { login } = useAuth();
+
   const form = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -23,20 +28,20 @@ const SignIn = () => {
     },
   });
 
-  const { mutate, isPending} = useLoginMutation();
   const handleOnSubmit = (values: SignInFormData) => {
     mutate(values, {
-          onSuccess: () => {
-            toast.success("Успішний вхід", { description: "Логін та пароль успішно пройшли перевірку." });
-            form.reset()
-            navigate('/dashboard')
-          },
-          onError: (error: any) => {
-            const message = error?.response?.data?.message || 'Щось пішло не так. Спробуйте ще раз.';
-            toast.error(message);
-            console.log("Login error:", error);
-          }
-        });
+      onSuccess: (data) => {
+        login(data)
+        toast.success("Успішний вхід", { description: "Логін та пароль успішно пройшли перевірку." });
+        form.reset()
+        navigate('/dashboard')
+      },
+      onError: (error: any) => {
+        const message = error?.response?.data?.message || 'Щось пішло не так. Спробуйте ще раз.';
+        toast.error(message);
+        console.log("Login error:", error);
+      }
+    });
   }
 
   return (
@@ -57,11 +62,9 @@ const SignIn = () => {
                   <FormItem>
                     <FormLabel>Ваша електронна пошта</FormLabel>
                     <FormControl>
-                      <input
-                        className='border border-input bg-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
-                          focus-visible:ring-ring focus-visible:ring-offset-2 focus:border-white'
-                        type='email' placeholder='email@example.com' {...field} />
+                      <Input type='email' placeholder='email@example.com' {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -75,10 +78,9 @@ const SignIn = () => {
                       <Link to='/forgot-password' className='text-sm text-blue-600 hover:underline'>Забули пароль?</Link>
                     </div>
                     <FormControl>
-                      <input className='border border-input bg-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
-                          focus-visible:ring-ring focus-visible:ring-offset-2 focus:border-white'
-                        type='password' placeholder='qwerty' {...field} />
+                      <Input type='password' placeholder='qwerty' {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

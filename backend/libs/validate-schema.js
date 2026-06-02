@@ -15,4 +15,14 @@ const verifyEmailSchema = z.object({
   token: z.string().min(1, "Токен верифікації обов'язковий"),
 });
 
-export { registerSchema, loginSchema, verifyEmailSchema };
+const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Токен скидування пароля обов'язковий"),
+  newPassword: z.string().min(6, "Новий пароль повинен містити принаймні 6 символів"),
+  confirmNewPassword: z.string().min(6, "Подтверждение пароля должно содержать не менее 6 символов"),
+});
+
+const emailSchema = z.object({
+  email: z.string().email("Невірний формат електронної пошти"),
+});
+
+export { registerSchema, loginSchema, verifyEmailSchema, resetPasswordSchema, emailSchema };
