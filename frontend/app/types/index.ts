@@ -1,6 +1,24 @@
 export interface User {
-    id: string;
+    _id: string;
     email: string;
     name: string;
     createdAt: Date;
+    isEmailVerified: boolean;
+    updateAt: Date;
+    profilePicture?: string;
+}
+
+export interface Workspace {
+    _id: string;
+    name: string;
+    description?: string;
+    owner: User | string;
+    color: string;
+    members: {
+        user: User;
+        role: "admin" | "member" | "owner" | "viewer";
+        joined: Date;
+    }[];
+    createdAt: Date;
+    updateAt: Date;
 }
