@@ -1,5 +1,7 @@
 import { Header } from '@/components/layout/header';
+import { SidebarComponent } from '@/components/layout/sidebar-component';
 import { Loader } from '@/components/Loader';
+import { CreateWorkspace } from '@/components/workspace/create-workspace';
 import { useAuth } from '@/provider/auth-context';
 import type { Workspace } from '@/types';
 import { useState } from 'react';
@@ -24,7 +26,7 @@ const DashboardLayout = () => {
 
   return (
     <div className="flex h-screen w-full">
-      {/* <SidebarComponnent /> */}
+      <SidebarComponent currentWorkspace={currentWorkspace}/>
 
         <div className="flex flex-1 flex-col h-full">
           <Header
@@ -39,6 +41,8 @@ const DashboardLayout = () => {
             </div>
           </main>
         </div>
+
+        <CreateWorkspace isCreatingWorkspace={isCreatingWorkspace} setIsCreatingWorkspace={setIsCreatingWorkspace} />
     </div>
   )
 }

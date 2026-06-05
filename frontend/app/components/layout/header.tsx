@@ -1,10 +1,11 @@
 import { useAuth } from "@/provider/auth-context";
 import type { Workspace } from "@/types";
 import { Button } from "../ui/button";
-import { Bell } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Bell, PlusCircle } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Link } from "react-router";
+import { WorkspaceAvatar } from "../workspace/workspace-avatar";
 
 interface HeaderProps {
     onWorkspaceSelected: (workspace: Workspace) => void;
@@ -14,15 +15,52 @@ interface HeaderProps {
 
 export const Header = ({ onWorkspaceSelected, selectedWorkspace, onCreateWorkspace }: HeaderProps) => {
     const { user, logout } = useAuth();
+    const workspaces = [];
 
     return (
         <div className="bg-background sticky top-0 z-40 border-b">
             <div className="flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
-                <div></div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant={"outline"} className="min-w-50">
+                            {selectedWorkspace ? (
+                                <>
+                                    {selectedWorkspace.color && (
+                                        <WorkspaceAvatar color={selectedWorkspace.color} name={selectedWorkspace.name} />
+                                    )}
+                                    <span className="font-medium">{selectedWorkspace?.name}</span>
+                                </>
+                            ) : (
+                                <span className="font-medium">Оберіть проект</span>
+                            )}
+                        </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent>
+                        <DropdownMenuLabel>Виберіть проект</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuGroup>
+                            {workspaces.map((workspace) => (
+                                <DropdownMenuItem key={workspace._id} onClick={() => onWorkspaceSelected(workspace)}>
+                                    {workspace.color && (<WorkspaceAvatar color={workspace.color} name={workspace.name} />)}
+                                    <span className="ml-2">{workspace.name}</span>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuGroup>
+
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem onClick={onCreateWorkspace}>
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                Створити проект
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
                 <div className="flex items-center gap-3">
-                    <Button variant="ghost" className="rounded-full w-9 h-9">
-                        <Bell/>
+                    <Button variant={"ghost"} className="rounded-full w-9 h-9">
+                        <Bell />
                     </Button>
 
                     <DropdownMenu>

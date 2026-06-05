@@ -20,3 +20,9 @@ export const resetPasswordSchema = z.object({
   newPassword: z.string().min(6, "Пароль повинен містить принаймні 6 символів"),
   confirmNewPassword: z.string().min(6, "Пароль повинен містить принаймні 6 символів"),
 }).refine((data) => data.newPassword === data.confirmNewPassword, { message: "Паролі не співпадают", path: ["confirmNewPassword"] });
+
+export const  workspaceSchema = z.object({ 
+  name: z.string().min(3, "Ім'я повинно містити принаймні 2 символи"),
+  color: z.string().min(3, "Не вірний формат кольору"),
+  description: z.string().optional(), 
+});
