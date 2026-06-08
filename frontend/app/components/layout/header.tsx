@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Bell, PlusCircle } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Link } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { WorkspaceAvatar } from "../workspace/workspace-avatar";
 
 interface HeaderProps {
@@ -15,7 +15,7 @@ interface HeaderProps {
 
 export const Header = ({ onWorkspaceSelected, selectedWorkspace, onCreateWorkspace }: HeaderProps) => {
     const { user, logout } = useAuth();
-    const workspaces = [];
+    const { workspaces } = useLoaderData() as { workspaces: Workspace[] };
 
     return (
         <div className="bg-background sticky top-0 z-40 border-b">
@@ -25,9 +25,7 @@ export const Header = ({ onWorkspaceSelected, selectedWorkspace, onCreateWorkspa
                         <Button variant={"outline"} className="min-w-50">
                             {selectedWorkspace ? (
                                 <>
-                                    {selectedWorkspace.color && (
-                                        <WorkspaceAvatar color={selectedWorkspace.color} name={selectedWorkspace.name} />
-                                    )}
+                                    {selectedWorkspace.color && (<WorkspaceAvatar color={selectedWorkspace.color} name={selectedWorkspace.name} />)}
                                     <span className="font-medium">{selectedWorkspace?.name}</span>
                                 </>
                             ) : (

@@ -25,4 +25,10 @@ const emailSchema = z.object({
   email: z.string().email("Невірний формат електронної пошти"),
 });
 
-export { registerSchema, loginSchema, verifyEmailSchema, resetPasswordSchema, emailSchema };
+const workspaceSchema = z.object({ 
+  name: z.string().min(3, "Ім'я повинно містити принаймні 2 символи"),
+  color: z.string().min(3, "Не вірний формат кольору"),
+  description: z.string().optional(), 
+});
+
+export { registerSchema, loginSchema, verifyEmailSchema, resetPasswordSchema, emailSchema, workspaceSchema };

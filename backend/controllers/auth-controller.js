@@ -51,7 +51,7 @@ export const registerUser = async (req, res) => {
         return res.status(201).json({ success: true, error: false, message: "Лист для верифікації надіслано на ваш email. Будь ласка, перевірте свою пошту", });
     } catch (error) {
         console.error("auth-controller - registerUser:", error);
-        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так", });
+        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у registerUser", });
     }
 };
 
@@ -96,7 +96,7 @@ export const loginUser = async (req, res) => {
         return res.status(200).json({ success: true, error: false, message: "Вхід успішний", token, user: userData });
     } catch (error) {
         console.error("auth-controller - loginUser:", error);
-        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так", });
+        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у loginUser", });
     }
 };
 
@@ -140,7 +140,7 @@ export const verifyEmail = async (req, res) => {
         return res.status(200).json({ success: true, error: false, message: "Email підтверджено", });
     } catch (error) {
         console.error("auth-controller - verifyEmail:", error);
-        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так", });
+        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у verifyEmail", });
     }
 };
 
@@ -186,7 +186,7 @@ export const resetPasswordRequest = async (req, res) => {
         return res.status(200).json({ success: true, error: false, message: "Лист для скидання пароля надіслано", });
     } catch (error) {
         console.error("auth-controller - resetPassword:", error);
-        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так", });
+        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у resetPasswordRequest", });
     }
 };
 
@@ -232,6 +232,6 @@ export const resetPassword = async (req, res) => {
         return res.status(200).json({ success: true, error: false, message: "Пароль успішно скинуто", });
     } catch (error) {
         console.error("auth-controller - resetPassword:", error);
-        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так", });
+        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у resetPassword", });
     }
 };
