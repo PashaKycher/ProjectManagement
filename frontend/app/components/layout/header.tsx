@@ -29,13 +29,13 @@ export const Header = ({ onWorkspaceSelected, selectedWorkspace, onCreateWorkspa
                                     <span className="font-medium">{selectedWorkspace?.name}</span>
                                 </>
                             ) : (
-                                <span className="font-medium">Оберіть проект</span>
+                                <span className="font-medium">Оберіть робочий простір</span>
                             )}
                         </Button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent>
-                        <DropdownMenuLabel>Виберіть проект</DropdownMenuLabel>
+                        <DropdownMenuLabel>Виберіть робочий простір</DropdownMenuLabel>
                         <DropdownMenuSeparator />
 
                         <DropdownMenuGroup>
@@ -50,7 +50,7 @@ export const Header = ({ onWorkspaceSelected, selectedWorkspace, onCreateWorkspa
                         <DropdownMenuGroup>
                             <DropdownMenuItem onClick={onCreateWorkspace}>
                                 <PlusCircle className="mr-2 h-4 w-4" />
-                                Створити проект
+                                Новий простір
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                     </DropdownMenuContent>

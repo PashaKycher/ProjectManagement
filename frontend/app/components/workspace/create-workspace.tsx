@@ -62,7 +62,7 @@ export const CreateWorkspace = ({ isCreatingWorkspace, setIsCreatingWorkspace }:
         <Dialog open={isCreatingWorkspace} onOpenChange={setIsCreatingWorkspace} modal={true}>
             <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Створити новий проект</DialogTitle>
+                    <DialogTitle>Створити новий робочий простір</DialogTitle>
                 </DialogHeader>
 
                 <Form {...form}>
@@ -71,9 +71,9 @@ export const CreateWorkspace = ({ isCreatingWorkspace, setIsCreatingWorkspace }:
                             <FormField control={form.control} name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Назва проекту</FormLabel>
+                                        <FormLabel>Назва</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Назва проекту" {...field} />
+                                            <Input placeholder="Назва робочого простору" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -82,9 +82,9 @@ export const CreateWorkspace = ({ isCreatingWorkspace, setIsCreatingWorkspace }:
                             <FormField control={form.control} name="description"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Опис проекту</FormLabel>
+                                        <FormLabel>Опис</FormLabel>
                                         <FormControl>
-                                            <Textarea placeholder="Опис проекту" {...field} />
+                                            <Textarea placeholder="Опис робочого простору" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -93,7 +93,7 @@ export const CreateWorkspace = ({ isCreatingWorkspace, setIsCreatingWorkspace }:
                             <FormField control={form.control} name="color"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Колір проекту</FormLabel>
+                                        <FormLabel>Колір</FormLabel>
                                         <FormControl>
                                             <div className="flex gap-3 flex-wrap">
                                                 {colorOptions.map((color) => (
