@@ -1,3 +1,4 @@
+import Project from "../models/project.js";
 import Workspace from "../models/workspace.js";
 
 export const getWorkspaces = async (req, res) => {
@@ -27,5 +28,41 @@ export const createWorkspace = async (req, res) => {
     } catch (error) {
         console.error("workspace-controller - createWorkspace:", error);
         return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у createWorkspace", });
+    }
+}
+
+export const getWorkspaceById = async (req, res) => {
+    try {
+        const { workspaceId } = req.params;
+
+        const workspace = await Workspace.findOne({ _id: workspaceId, "members.user": req.user._id, }).populate("members.user", "name email profilePicture");
+        if (!workspace) {
+            return res.status(404).json({ success: false, error: true, message: "Робочий проект не знайдено, чи ви не маєте доступу. Зверніться до адміністратора!", });
+        }
+
+        return res.status(200).json(workspace);
+    } catch (error) {
+        console.error("workspace-controller - getWorkspaceById:", error);
+        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у getWorkspaceById", });
+    }
+}
+
+export const getWorkspaceByIdProjects = async (req, res) => {
+    try {
+        const { workspaceId } = req.params;
+
+        const workspace = await Workspace.findOne({ _id: workspaceId, "members.user": req.user._id, }).populate("members.user", "name email profilePicture");
+        if (!workspace) {
+            return res.status(404).json({ success: false, error: true, message: "Робочий проект не знайдено, чи ви не маєте доступу. Зверніться до адміністратора!", });
+        }
+
+        const projects = await Project.find({ workspace: workspaceId, isArchived: false, members: { $in: req.user._id }, })
+            .populate("tasks", "status")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({ projects, workspace });
+    } catch (error) {
+        console.error("workspace-controller - getWorkspaceByIdProjects:", error);
+        return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у getWorkspaceByIdProjects", });
     }
 }
