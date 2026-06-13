@@ -56,7 +56,7 @@ export interface Project {
     tasks: Task[];
     members: {
         user: User;
-        role: "manager" | "contributor" | "viewer";
+        role: "admin" | "member" | "owner" | "viewer";
         joinedAt: Date;
     }[];
     isArchived: boolean;
@@ -98,4 +98,11 @@ export interface Attachment {
     fileUrl: string;
     uploadedBy: string;
     uploadedAt: Date;
+}
+
+export interface Member {
+    _id: string;
+    user: User;
+    role: "admin" | "member" | "owner" | "viewer";
+    joinedAt: Date;
 }

@@ -31,4 +31,19 @@ const workspaceSchema = z.object({
   description: z.string().optional(), 
 });
 
-export { registerSchema, loginSchema, verifyEmailSchema, resetPasswordSchema, emailSchema, workspaceSchema };
+const projectSchema = z.object({ 
+  title: z.string().min(3, "Ім'я повинно містити принаймні 2 символи"),
+  description: z.string().optional(), 
+  status: z.enum(["Planning", "In Progress", "On Hold", "Completed", "Cancelled"]),
+  startDate: z.string(),
+  dueDate: z.string().optional(),
+  tags: z.string().optional(),
+  members: z.array(
+    z.object({
+      user: z.string(),
+      role: z.enum(["admin", "member", "owner", "viewer"]),
+    })
+  ).optional(),
+});
+
+export { registerSchema, loginSchema, verifyEmailSchema, resetPasswordSchema, emailSchema, workspaceSchema, projectSchema };
