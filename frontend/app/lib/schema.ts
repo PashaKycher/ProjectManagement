@@ -22,15 +22,15 @@ export const resetPasswordSchema = z.object({
   confirmNewPassword: z.string().min(6, "Пароль повинен містить принаймні 6 символів"),
 }).refine((data) => data.newPassword === data.confirmNewPassword, { message: "Паролі не співпадают", path: ["confirmNewPassword"] });
 
-export const  workspaceSchema = z.object({ 
+export const workspaceSchema = z.object({
   name: z.string().min(3, "Ім'я повинно містити принаймні 2 символи"),
   color: z.string().min(3, "Не вірний формат кольору"),
-  description: z.string().optional(), 
+  description: z.string().optional(),
 });
 
-export const projectSchema = z.object({ 
+export const projectSchema = z.object({
   title: z.string().min(3, "Ім'я повинно містити принаймні 2 символи"),
-  description: z.string().optional(), 
+  description: z.string().optional(),
   status: z.nativeEnum(ProjectStatus),
   startDate: z.string().min(6, "Невірний формат дати"),
   dueDate: z.string().min(6, "Невірний формат дати"),
@@ -40,5 +40,8 @@ export const projectSchema = z.object({
       user: z.string(),
       role: z.enum(["admin", "member", "owner", "viewer"]),
     })
-  ).optional(),
-});
+  ).min(1, "Необхідно вибрати хоча б одного учасника"),
+}).refine(
+  (data) => { return new Date(data.dueDate) >= new Date(data.startDate); },
+  { path: ["dueDate"], message: "Дата завершення не може бути меншою за дату початку", }
+);

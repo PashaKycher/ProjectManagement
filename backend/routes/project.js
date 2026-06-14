@@ -7,6 +7,6 @@ import { z } from 'zod';
 
 const router = express.Router();
 
-router.post("/:workspaceId/create-project", authMiddlaware, validateRequest({ params: z.object({workspaceId: z.string()}), body: projectSchema,}), createProject);
+router.post("/:workspaceId/create-project", authMiddlaware, validateRequest({ params: z.object({ workspaceId: z.string() }), body: projectSchema, }), createProject);
 
 export default router

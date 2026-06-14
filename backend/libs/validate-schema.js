@@ -25,15 +25,15 @@ const emailSchema = z.object({
   email: z.string().email("Невірний формат електронної пошти"),
 });
 
-const workspaceSchema = z.object({ 
+const workspaceSchema = z.object({
   name: z.string().min(3, "Ім'я повинно містити принаймні 2 символи"),
   color: z.string().min(3, "Не вірний формат кольору"),
-  description: z.string().optional(), 
+  description: z.string().optional(),
 });
 
-const projectSchema = z.object({ 
+const projectSchema = z.object({
   title: z.string().min(3, "Ім'я повинно містити принаймні 2 символи"),
-  description: z.string().optional(), 
+  description: z.string().optional(),
   status: z.enum(["Planning", "In Progress", "On Hold", "Completed", "Cancelled"]),
   startDate: z.string(),
   dueDate: z.string().optional(),
