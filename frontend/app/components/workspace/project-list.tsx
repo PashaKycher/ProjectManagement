@@ -12,7 +12,7 @@ export const ProjectList = ({ workspaceId, projects, onCreateProject }: ProjectL
     return (
         <div>
             <h3 className="text-xl font-medium mb-4">Проекти</h3>
-            <div className="grid gap-6 sm:grid-col-2 lg:grid-col-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {projects.length === 0 ? (
                     <NoDataFound title='У цьому робочому просторі ще немає проектів' description='Створіть свій перший проект' buttonText='Створити проект' buttonAction={onCreateProject} />
                 ) : (

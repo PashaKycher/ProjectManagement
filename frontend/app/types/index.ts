@@ -13,10 +13,17 @@ export enum TaskStatus {
     DONE = "Done",
 }
 
-export enum Priority {
+export enum PriorityStatus {
     LOW = "Low",
     MEDIUM = "Medium",
     HIGH = "High",
+}
+
+export enum RoleStatus {
+    OWNER = "Owner",
+    ADMIN = "Admin",
+    MEMBER = "Member",
+    VIEWER = "Viewer",
 }
 
 export interface User {
@@ -37,7 +44,7 @@ export interface Workspace {
     color: string;
     members: {
         user: User;
-        role: "admin" | "member" | "owner" | "viewer";
+        role: RoleStatus;
         joined: Date;
     }[];
     createdAt: Date;
@@ -56,7 +63,7 @@ export interface Project {
     tasks: Task[];
     members: {
         user: User;
-        role: "admin" | "member" | "owner" | "viewer";
+        role: RoleStatus;
         joinedAt: Date;
     }[];
     isArchived: boolean;
@@ -74,7 +81,7 @@ export interface Task {
     updatedAt: Date;
     isArchived: boolean;
     dueDate: Date;
-    priority: Priority;
+    priority: PriorityStatus;
     assignee: User | string;
     createdBy: User | string;
     assignees: User[];
@@ -103,6 +110,6 @@ export interface Attachment {
 export interface Member {
     _id: string;
     user: User;
-    role: "admin" | "member" | "owner" | "viewer";
+    role: RoleStatus;
     joinedAt: Date;
 }

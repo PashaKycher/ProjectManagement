@@ -17,6 +17,7 @@ import { CalendarIcon } from "lucide-react"
 import { Checkbox } from "../ui/checkbox"
 import { useCreateProject } from "@/hooks/use-project"
 import { toast } from "sonner"
+import { roleTranslation, statusTranslation } from "@/lib"
 
 interface CreateProjectDialogProps {
   isOpen: boolean
@@ -40,34 +41,6 @@ export const CreateProjectDialog = ({ isOpen, workspaceId, onOpenChange, workspa
       tags: undefined,
     }
   })
-
-  const statusTranslation = (status: ProjectStatus) => {
-    switch (status) {
-      case ProjectStatus.PLANNING:
-        return "Планується"
-      case ProjectStatus.IN_PROGRESS:
-        return "В роботі"
-      case ProjectStatus.ON_HOLD:
-        return "На очікуванні"
-      case ProjectStatus.COMPLETED:
-        return "Завершено"
-      case ProjectStatus.CANCELLED:
-        return "Скасовано"
-    }
-  }
-
-  const roleTranslation = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "Адміністратор"
-      case "member":
-        return "Учасник"
-      case "owner":
-        return "Власник"
-      case "viewer":
-        return "Переглядач"
-    }
-  }
 
   const { mutate, isPending } = useCreateProject()
   const onSubmit = (values: CreateProjectFormData) => {
