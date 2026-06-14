@@ -11,7 +11,7 @@ const projectSchema = new mongoose.Schema({
   tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
   members: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    role: { type: String, enum: ["admin", "member", "owner", "viewer"], default: "contributor", },
+    role: { type: String, enum: ["admin", "member", "owner", "viewer"], default: "viewer", },
     joinedAt: { type: Date, default: Date.now }
   }],
   tags: [{ type: String }],

@@ -5,7 +5,7 @@ const taskSchema = new mongoose.Schema({
     title: { type: String, required: true, trim: true },
     description: { type: String, trim: true },
     project: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Project' },
-    status: { type: String, enum: ["To Do", "In Progress", "Review", "Done"], default: "ToDo", },
+    status: { type: String, enum: ["To Do", "In Progress", "Review", "Done"], default: "To Do", },
     priority: { type: String, enum: ["Low", "Medium", "High"], default: "Medium", },
     assignees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     watchers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -16,7 +16,7 @@ const taskSchema = new mongoose.Schema({
     tags: [{ type: String }],
     subtasks: [{
         title: { type: String, required: true },
-        complited: { type: Boolean, default: false },
+        completed: { type: Boolean, default: false },
         createdAt: { type: Date, default: Date.now }
     }],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],

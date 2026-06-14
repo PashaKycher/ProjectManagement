@@ -1,5 +1,6 @@
 import Project from "../models/project.js";
 import Workspace from "../models/workspace.js";
+import Task from "../models/taks.js";
 
 export const getWorkspaces = async (req, res) => {
     try {
@@ -56,7 +57,7 @@ export const getWorkspaceByIdProjects = async (req, res) => {
             return res.status(404).json({ success: false, error: true, message: "Робочий проект не знайдено, чи ви не маєте доступу. Зверніться до адміністратора!", });
         }
 
-        const projects = await Project.find({ workspace: workspaceId, isArchived: false, members: { $in: req.user._id }, })
+        const projects = await Project.find({ workspace: workspaceId, isArchived: false, "members.user": req.user._id, })
             .populate("tasks", "status")
             .sort({ createdAt: -1 });
 
