@@ -1,5 +1,6 @@
 import Workspace from "../models/workspace.js";
 import Project from "../models/project.js";
+import Task from "../models/taks.js";
 
 export const createProject = async (req, res) => {
   try {
@@ -27,5 +28,47 @@ export const createProject = async (req, res) => {
   } catch (error) {
     console.error("project-controller - createProject:", error);
     return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у createProject", });
+  }
+}
+
+export const getProjectDitails = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ success: false, error: true, message: "Проект не знайдено", });
+    }
+
+    const isMember = project.members.some((member) => member.user.toString() === req.user._id.toString());
+    if (!isMember) {
+      return res.status(403).json({ success: false, error: true, message: "Ви не маєте доступу до цього проекту", });
+    }
+
+    return res.status(200).json({ project });
+  } catch (error) {
+    console.error("project-controller - getProjectDitails:", error);
+    return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у getProjectDitails", });
+  }
+}
+
+export const getProjectTasks = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const project = await Project.findById(projectId).populate("members.user");
+    if (!project) {
+      return res.status(404).json({ success: false, error: true, message: "Проект не знайдено", });
+    }
+
+    const isMember = project.members.some((member) => member.user._id.toString() === req.user._id.toString());
+    if (!isMember) {
+      return res.status(403).json({ success: false, error: true, message: "Ви не маєте доступу до цього проекту", });
+    }
+
+    const tasks = await Task.find({ project: projectId, isArchived: false }).populate("assignees", "name profilePicture").sort({ createdAt: -1 });
+
+    return res.status(200).json({ project, tasks });
+  } catch (error) {
+    console.error("project-controller - getProjectTasks:", error);
+    return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у getProjectTasks", });
   }
 }

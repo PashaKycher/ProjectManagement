@@ -1,4 +1,4 @@
-import { ProjectStatus } from '@/types';
+import { PriorityStatus, ProjectStatus, RoleStatus, TaskStatus } from '@/types';
 import { z } from 'zod';
 
 export const signInSchema = z.object({
@@ -33,15 +33,17 @@ export const projectSchema = z.object({
   description: z.string().optional(),
   status: z.nativeEnum(ProjectStatus),
   startDate: z.string().min(6, "Невірний формат дати"),
-  dueDate: z.string().min(6, "Невірний формат дати"),
+  dueDate: z.string().optional(),
   tags: z.string().optional(),
-  members: z.array(
-    z.object({
-      user: z.string(),
-      role: z.enum(["admin", "member", "owner", "viewer"]),
-    })
+  members: z.array(z.object({ user: z.string(), role: z.nativeEnum(RoleStatus), })
   ).min(1, "Необхідно вибрати хоча б одного учасника"),
-}).refine(
-  (data) => { return new Date(data.dueDate) >= new Date(data.startDate); },
-  { path: ["dueDate"], message: "Дата завершення не може бути меншою за дату початку", }
-);
+});
+
+export const createTaskSchema = z.object({
+  title: z.string().min(2, "Назва повинно містити принаймні 2 символи"),
+  description: z.string().optional(),
+  status: z.nativeEnum(TaskStatus),
+  priority: z.nativeEnum(PriorityStatus),
+  dueDate: z.string().min(6, "Невірний формат дати"),
+  assignees: z.array(z.string()).min(1, "Потрібен принаймні один виконавець"),
+});

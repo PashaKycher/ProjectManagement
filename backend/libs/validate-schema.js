@@ -26,13 +26,13 @@ const emailSchema = z.object({
 });
 
 const workspaceSchema = z.object({
-  name: z.string().min(3, "Ім'я повинно містити принаймні 2 символи"),
+  name: z.string().min(3, "Ім'я повинно містити принаймні 3 символи"),
   color: z.string().min(3, "Не вірний формат кольору"),
   description: z.string().optional(),
 });
 
 const projectSchema = z.object({
-  title: z.string().min(3, "Ім'я повинно містити принаймні 2 символи"),
+  title: z.string().min(3, "Назва повинно містити принаймні 3 символи"),
   description: z.string().optional(),
   status: z.enum(["Planning", "In Progress", "On Hold", "Completed", "Cancelled"]),
   startDate: z.string(),
@@ -46,4 +46,13 @@ const projectSchema = z.object({
   ).optional(),
 });
 
-export { registerSchema, loginSchema, verifyEmailSchema, resetPasswordSchema, emailSchema, workspaceSchema, projectSchema };
+const taskSchema = z.object({
+  title: z.string().min(2, "Назва повинно містити принаймні 2 символи"),
+  description: z.string().optional(),
+  status: z.enum(["To Do", "In Progress", "Review", "Done"]),
+  priority: z.enum(["Low", "Medium", "High"]),
+  dueDate: z.string().min(3, "Невірний формат дати"),
+  assignees: z.array(z.string()).min(1, "Потрібен принаймні один виконавець"),
+});
+
+export { registerSchema, loginSchema, verifyEmailSchema, resetPasswordSchema, emailSchema, workspaceSchema, projectSchema, taskSchema };
