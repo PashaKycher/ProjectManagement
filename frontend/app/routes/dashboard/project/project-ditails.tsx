@@ -1,15 +1,18 @@
 import { BackButton } from "@/components/back-button";
 import { Loader } from "@/components/Loader";
 import { CreateTaskDialog } from "@/components/task/create-task-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UseProjectQuery } from "@/hooks/use-project";
 import { getProjectProgress, priorityTranslation } from "@/lib";
 import { cn } from "@/lib/utils";
-import { TaskStatus, type Project, type Task } from "@/types";
+import { PriorityStatus, TaskStatus, type Project, type Task } from "@/types";
+import { format } from "date-fns";
+import { AlertCircle, CalendarDays, CheckCircle, Clock, PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
@@ -29,11 +32,11 @@ const ProjectDetails = () => {
   };
 
   if (isLoading || !data) return <Loader />
-  
+
   const { tasks, project } = data;
   const projectProgress = getProjectProgress(tasks);
 
-  const handleTaskClick = (taskId: string) => {navigate(`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`)};
+  const handleTaskClick = (taskId: string) => { navigate(`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`) };
 
   return (
     <div className="space-y-8">
@@ -56,7 +59,7 @@ const ProjectDetails = () => {
 
       <div className="flex items-center justify-between">
         <Tabs defaultValue="all" className="w-full">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
             <TabsList>
               <TabsTrigger value="all" onClick={() => setTaskFilter("ALL")}>Всі</TabsTrigger>
               <TabsTrigger value="todo" onClick={() => setTaskFilter(TaskStatus.TO_DO)}>Виконати</TabsTrigger>
@@ -65,8 +68,8 @@ const ProjectDetails = () => {
               <TabsTrigger value="done" onClick={() => setTaskFilter(TaskStatus.DONE)}>Виконані</TabsTrigger>
             </TabsList>
 
-            <div className="flex items-center text-sm">
-              <span className="text-muted-foreground">Статус:</span>
+            <div className="lg:flex items-center text-sm">
+              <span className="text-muted-foreground">Статус: </span>
               <div>
                 <Badge variant="outline" className="bg-background">
                   {tasks.filter((task) => task.status === "To Do").length} Виконати
@@ -85,7 +88,7 @@ const ProjectDetails = () => {
           </div>
 
           <TabsContent value="all" className="m-0">
-            <div className="grid grid-cols-4 gap-4">
+            <div className="lg:grid grid-cols-4 gap-4">
               <TaskColumn title="Виконати" tasks={tasks.filter((task) => task.status === TaskStatus.TO_DO)} onTaskClick={handleTaskClick} />
               <TaskColumn title="В роботі" tasks={tasks.filter((task) => task.status === TaskStatus.IN_PROGRESS)} onTaskClick={handleTaskClick} />
               <TaskColumn title="На перевірці" tasks={tasks.filter((task) => task.status === TaskStatus.REVIEW)} onTaskClick={handleTaskClick} />
@@ -136,7 +139,7 @@ const TaskColumn = ({ title, tasks, onTaskClick, isFullWidth = false }: TaskColu
           </div>
         )}
 
-        <div className={cn(!isFullWidth ? "space-y-2 flex flex-col" : "grid grid-cols-3 gap-4")}>
+        <div className={cn(!isFullWidth ? "flex flex-col gap-2" : "md:grid grid-cols-3 gap-4")}>
           {tasks.length === 0 ? (
             <div className="text-center text-sm text-muted-foreground">Ще немає завдань</div>
           ) : (tasks.map((task) => (
@@ -150,12 +153,90 @@ const TaskColumn = ({ title, tasks, onTaskClick, isFullWidth = false }: TaskColu
 
 const TaskCard = ({ task, onClick }: { task: Task, onClick: () => void }) => {
   return (
-    <Card onClick={onClick} className="cursor-pointer hover:shadow-md transition-all duration-300 hover:translate-y-1">
+    <Card onClick={onClick} className="cursor-pointer hover:shadow-md transition-all duration-300 hover:translate-y-1 mb-2 ">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <Badge>{priorityTranslation(task.priority)}</Badge>
+          <Badge className={
+            task.priority === PriorityStatus.HIGH ? "bg-red-500 taxt-white" :
+              task.priority === PriorityStatus.MEDIUM ? "bg-orange-500 taxt-white" :
+                "bg-slate-500 taxt-white"
+          }>
+            {priorityTranslation(task.priority)}
+          </Badge>
+
+          <div className="flex gap-1">
+              <Button variant={"ghost"} size={"icon"} className="size-6" title="Сплановано" onClick={(e) => { e.stopPropagation(); console.log("Сплановано") }}>
+                <AlertCircle className={cn("size-4", task.status !== TaskStatus.TO_DO && "text-green-500")}/>
+                <span className="sr-only">Сплановано</span>
+              </Button>
+
+            {task.status !== TaskStatus.TO_DO && (
+              <Button variant={"ghost"} size={"icon"} className="size-6" title="Зроблено" onClick={(e) => { e.stopPropagation(); console.log("Зроблено") }}>
+                <Clock className={cn("size-4", task.status !== TaskStatus.IN_PROGRESS && "text-green-500")}/>
+                <span className="sr-only">Зроблено</span>
+              </Button>
+            )}
+
+            {task.status !== TaskStatus.TO_DO && task.status !== TaskStatus.IN_PROGRESS && (
+              <Button variant={"ghost"} size={"icon"} className="size-6" title="Перевірено" onClick={(e) => { e.stopPropagation(); console.log("Перевірено") }}>
+                <PlusCircle className={cn("size-4", task.status !== TaskStatus.REVIEW && "text-green-500")}/>
+                <span className="sr-only">Перевірено</span>
+              </Button>
+            )}
+
+            {task.status === TaskStatus.DONE && (
+              <Button variant={"ghost"} size={"icon"} className="size-6" title="Виконано" onClick={(e) => { e.stopPropagation(); console.log("Виконано") }}>
+                <CheckCircle className={cn("size-4 text-green-500")}/>
+                <span className="sr-only">Виконано</span>
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
+
+      <CardContent>
+        <h4 className="font-medium mb-2">{task.title}</h4>
+
+        {task.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2">{task.description}</p>
+        )}
+
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-2">
+            {task.assignees && task.assignees.length > 0 && (
+              <div className="flex -space-x-2">
+                {task.assignees.slice(0, 5).map((assignee) => (
+                  <Avatar key={assignee._id} className="relative size-8 bg-gray-700 rounded-full border-2 overflow-hidden border-background" title={assignee.name}>
+                    <AvatarImage src={assignee.profilePicture} alt={assignee.name}/>
+
+                    <AvatarFallback>{assignee.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                ))}
+
+                {task.assignees.length > 5 && (
+                  <span className="text-xs text-muted-foreground">
+                    + {task.assignees.length - 5}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {task.dueDate && (
+            <div className="text-sm text-muted-foreground flex items-center">
+              <CalendarDays className="size-3 mr-1" />
+
+              {format(new Date(task.dueDate), "dd.MM.yyyy")}
+            </div>
+          )}
+        </div>
+
+        {task.subtasks && task.subtasks.length > 0 && (
+          <div className="mt-2 text-xs text-muted-foreground">
+            {task.subtasks.filter((subtask) => subtask.completed).length} / {task.subtasks.length} підзавдань
+          </div>
+        )}
+      </CardContent>
     </Card>
   )
 }
