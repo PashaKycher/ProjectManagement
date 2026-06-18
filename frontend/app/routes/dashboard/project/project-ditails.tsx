@@ -39,8 +39,8 @@ const ProjectDetails = () => {
   const handleTaskClick = (taskId: string) => { navigate(`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`) };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="h-screen flex flex-col">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
         <div>
           <BackButton />
           <div className="flex items-center gap-3"><h1 className="text-xl md:text-2xl font-bold">{project.title}</h1></div>
@@ -58,8 +58,8 @@ const ProjectDetails = () => {
       </div>
 
       <div className="flex items-center justify-between">
-        <Tabs defaultValue="all" className="w-full">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+        <Tabs defaultValue="all" className="flex flex-col flex-1">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-2">
             <TabsList>
               <TabsTrigger value="all" onClick={() => setTaskFilter("ALL")}>Всі</TabsTrigger>
               <TabsTrigger value="todo" onClick={() => setTaskFilter(TaskStatus.TO_DO)}>Виконати</TabsTrigger>
@@ -88,7 +88,7 @@ const ProjectDetails = () => {
           </div>
 
           <TabsContent value="all" className="m-0">
-            <div className="lg:grid grid-cols-4 gap-4">
+            <div className="lg:grid grid-cols-4 gap-2">
               <TaskColumn title="Виконати" tasks={tasks.filter((task) => task.status === TaskStatus.TO_DO)} onTaskClick={handleTaskClick} />
               <TaskColumn title="В роботі" tasks={tasks.filter((task) => task.status === TaskStatus.IN_PROGRESS)} onTaskClick={handleTaskClick} />
               <TaskColumn title="На перевірці" tasks={tasks.filter((task) => task.status === TaskStatus.REVIEW)} onTaskClick={handleTaskClick} />
@@ -131,9 +131,9 @@ interface TaskColumnProps {
 const TaskColumn = ({ title, tasks, onTaskClick, isFullWidth = false }: TaskColumnProps) => {
   return (
     <div className={isFullWidth ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : ""}>
-      <div className={cn("space-y-4", !isFullWidth ? "h-full" : "col-span-full mb-4")}>
+      <div className={cn(!isFullWidth ? "h-full" : "col-span-full mb-4")}>
         {!isFullWidth && (
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-1">
             <h1 className="font-medium">{title}</h1>
             <Badge variant="outline">{tasks.length}</Badge>
           </div>
@@ -165,28 +165,28 @@ const TaskCard = ({ task, onClick }: { task: Task, onClick: () => void }) => {
           </Badge>
 
           <div className="flex gap-1">
-              <Button variant={"ghost"} size={"icon"} className="size-6" title="Сплановано" onClick={(e) => { e.stopPropagation(); console.log("Сплановано") }}>
-                <AlertCircle className={cn("size-4", task.status !== TaskStatus.TO_DO && "text-green-500")}/>
-                <span className="sr-only">Сплановано</span>
-              </Button>
+            <Button variant={"ghost"} size={"icon"} className="size-6" title="Сплановано" onClick={(e) => { e.stopPropagation(); console.log("Сплановано") }}>
+              <AlertCircle className={cn("size-4", task.status !== TaskStatus.TO_DO && "text-green-500")} />
+              <span className="sr-only">Сплановано</span>
+            </Button>
 
             {task.status !== TaskStatus.TO_DO && (
               <Button variant={"ghost"} size={"icon"} className="size-6" title="Зроблено" onClick={(e) => { e.stopPropagation(); console.log("Зроблено") }}>
-                <Clock className={cn("size-4", task.status !== TaskStatus.IN_PROGRESS && "text-green-500")}/>
+                <Clock className={cn("size-4", task.status !== TaskStatus.IN_PROGRESS && "text-green-500")} />
                 <span className="sr-only">Зроблено</span>
               </Button>
             )}
 
             {task.status !== TaskStatus.TO_DO && task.status !== TaskStatus.IN_PROGRESS && (
               <Button variant={"ghost"} size={"icon"} className="size-6" title="Перевірено" onClick={(e) => { e.stopPropagation(); console.log("Перевірено") }}>
-                <PlusCircle className={cn("size-4", task.status !== TaskStatus.REVIEW && "text-green-500")}/>
+                <PlusCircle className={cn("size-4", task.status !== TaskStatus.REVIEW && "text-green-500")} />
                 <span className="sr-only">Перевірено</span>
               </Button>
             )}
 
             {task.status === TaskStatus.DONE && (
               <Button variant={"ghost"} size={"icon"} className="size-6" title="Виконано" onClick={(e) => { e.stopPropagation(); console.log("Виконано") }}>
-                <CheckCircle className={cn("size-4 text-green-500")}/>
+                <CheckCircle className={cn("size-4 text-green-500")} />
                 <span className="sr-only">Виконано</span>
               </Button>
             )}
@@ -207,7 +207,7 @@ const TaskCard = ({ task, onClick }: { task: Task, onClick: () => void }) => {
               <div className="flex -space-x-2">
                 {task.assignees.slice(0, 5).map((assignee) => (
                   <Avatar key={assignee._id} className="relative size-8 bg-gray-700 rounded-full border-2 overflow-hidden border-background" title={assignee.name}>
-                    <AvatarImage src={assignee.profilePicture} alt={assignee.name}/>
+                    <AvatarImage src={assignee.profilePicture} alt={assignee.name} />
 
                     <AvatarFallback>{assignee.name.charAt(0)}</AvatarFallback>
                   </Avatar>
