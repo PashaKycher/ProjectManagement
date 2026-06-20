@@ -33,3 +33,24 @@ export const createTask = async (req, res) => {
     return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у createTask", });
   }
 }
+
+export const getTaskById = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    const task = await Task.findById(taskId).populate("assignees", "name profilePicture").populate("watchers", "name profilePicture");
+    if (!task) {
+      return res.status(404).json({ success: false, error: true, message: "Завдання не знайдено", });
+    }
+
+    const project = await Project.findById(task.project).populate("members.user", "name profilePicture");
+    if (!project) {
+      return res.status(404).json({ success: false, error: true, message: "Проект не знайдено", });
+    }
+
+    return res.status(200).json({task, project});
+  } catch (error) {
+    console.error("task-controller - getTaskById:", error);
+    return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у getTaskById", });
+  }
+}

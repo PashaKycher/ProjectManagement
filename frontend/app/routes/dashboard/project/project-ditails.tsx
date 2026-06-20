@@ -36,7 +36,7 @@ const ProjectDetails = () => {
   const { tasks, project } = data;
   const projectProgress = getProjectProgress(tasks);
 
-  const handleTaskClick = (taskId: string) => { navigate(`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`) };
+  const handleTaskClick = (taskId: string) => { navigate(`/workspace/${workspaceId}/project/${projectId}/task/${taskId}`) };
 
   return (
     <div className="h-screen flex flex-col">

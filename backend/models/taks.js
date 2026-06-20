@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { string } from "zod";
 
 const taskSchema = new mongoose.Schema({
     title: { type: String, required: true, trim: true },
