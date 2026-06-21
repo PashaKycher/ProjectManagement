@@ -7,6 +7,8 @@ import { useTaskByIdQuery } from '@/hooks/use-task';
 import { priorityTranslation } from '@/lib';
 import { useAuth } from '@/provider/auth-context';
 import type { Project, Task } from '@/types';
+import { formatDistanceToNow } from 'date-fns';
+import { uk } from "date-fns/locale"
 import { Eye, EyeOff } from 'lucide-react';
 import React from 'react'
 import { useNavigate, useParams } from 'react-router';
@@ -74,7 +76,11 @@ const TaskDitails = () => {
                 </Badge>
 
                 <TaskTitle title={task.title} taskId={task._id} />
+
+                <div className='text-sm  text-muted-foreground'>Створено: {" "}{formatDistanceToNow(new Date(task.createdAt), {addSuffix: true, locale: uk })}</div>
               </div>
+
+              
             </div>
           </div>
         </div>
