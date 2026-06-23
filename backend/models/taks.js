@@ -16,7 +16,9 @@ const taskSchema = new mongoose.Schema({
     subtasks: [{
         title: { type: String, required: true },
         completed: { type: Boolean, default: false },
-        createdAt: { type: Date, default: Date.now }
+        createdAt: { type: Date, default: Date.now },
+        updatedAt: { type: Date, default: Date.now },
+        createBy: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' }
     }],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
     attachments: [{

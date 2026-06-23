@@ -26,7 +26,7 @@ const TaskTitle = ({ title, taskId }: { title: string; taskId: string }) => {
           autoFocus
           disabled={isPending} />) : (<h2 className='text-xl flex-1 font-semibold'>{newTitle}</h2>)}
 
-      {isEditing ? (<Button onClick={updateTitle} disabled={isPending}>Save</Button>
+      {isEditing ? (<Button onClick={updateTitle} disabled={isPending} title='Зберегти'><Save className="size-3 cursor-pointer" /></Button>
       ) : (<Edit className="size-3 cursor-pointer" onClick={() => setIsEditing(true)} />)}
     </div>
   )

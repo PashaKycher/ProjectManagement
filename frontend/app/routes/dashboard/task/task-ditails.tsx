@@ -1,6 +1,13 @@
 import { BackButton } from '@/components/back-button';
 import { Loader } from '@/components/Loader';
+import Subtasks from '@/components/task/sub-tasks';
+import TaskActivity from '@/components/task/task-activity';
+import TaskAssigneesSelector from '@/components/task/task-assignees-selektor';
+import TaskDescription from '@/components/task/task-description';
+import TaskPrioritySelector from '@/components/task/task-priority-selector';
+import TaskStatusSelector from '@/components/task/task-status-selector';
 import TaskTitle from '@/components/task/task-title';
+import Watchers from '@/components/task/watchers';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTaskByIdQuery } from '@/hooks/use-task';
@@ -9,7 +16,7 @@ import { useAuth } from '@/provider/auth-context';
 import type { Project, Task } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { uk } from "date-fns/locale"
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, LucideDelete } from 'lucide-react';
 import React from 'react'
 import { useNavigate, useParams } from 'react-router';
 
@@ -64,8 +71,8 @@ const TaskDitails = () => {
         </div>
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-        <div className='lg:col-span-2'>
+      <div className='flex flex-col lg:flex-row gap-6'>
+        <div className='lg:col-span-2 lg:w-3/4'>
           <div className='bg-card rounded-lg p-6 shadow-sm mb-6'>
             <div className='flex flex-col md:flex-row justify-between items-start mb-4'>
               <div>
@@ -77,12 +84,36 @@ const TaskDitails = () => {
 
                 <TaskTitle title={task.title} taskId={task._id} />
 
-                <div className='text-sm  text-muted-foreground'>Створено: {" "}{formatDistanceToNow(new Date(task.createdAt), {addSuffix: true, locale: uk })}</div>
+                <div className='text-sm  text-muted-foreground'>Створено: {" "}{formatDistanceToNow(new Date(task.createdAt), { addSuffix: true, locale: uk })}</div>
               </div>
 
-              
+              <div className='flex items-center gap-2 mt-4 md:mt-0'>
+                <TaskStatusSelector status={task.status} taskId={task._id} />
+
+                <Button variant={'destructive'} size="sm" onClick={() => { }} className='hidden md:block' title="Видалити">
+                  <LucideDelete className="size-4" />
+                </Button>
+              </div>
             </div>
+
+            <div className='mb-6'>
+              <h3 className='text-sm font-medium text-muted-foreground mb-0'>Опис</h3>
+
+              <TaskDescription description={task.description || ""} taskId={task._id} />
+            </div>
+
+            <TaskAssigneesSelector projectMembers={project.members as any} assignees={task.assignees} task={task} />
+
+            <TaskPrioritySelector priority={task.priority} taskId={task._id} />
+
+            <Subtasks subTasks={task.subtasks || []} taskId={task._id} />
           </div>
+        </div>
+
+        <div className='w-full lg:w-1/4'>
+          <Watchers watchers={task.watchers || []} />
+
+          <TaskActivity resourceId={task._id} />
         </div>
       </div>
     </div>

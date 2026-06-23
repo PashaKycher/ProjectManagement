@@ -29,6 +29,7 @@ const DashboardLayout = () => {
   if (!isAuthenticated) {
     return <Navigate to="/sign-in" />;
   }
+  
 
   const handleWorkspaceSelector = (workspace: Workspace) => {
     setCurrentWorkspace(workspace);

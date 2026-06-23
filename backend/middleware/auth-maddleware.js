@@ -19,7 +19,7 @@ const authMiddlaware = async(req, res, next) => {
         next();
     } catch (error) {
         console.log("auth-middleware:", error);
-        res.status(500).json({ success: false, error: true, message: "Щось пішло не так у auth-middleware" });
+        res.status(401).json({ success: false, error: true, message: "Сесія закінчилась. Увійдіть знову." });
     }
 }
 

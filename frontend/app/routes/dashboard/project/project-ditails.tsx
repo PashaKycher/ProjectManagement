@@ -165,27 +165,27 @@ const TaskCard = ({ task, onClick }: { task: Task, onClick: () => void }) => {
           </Badge>
 
           <div className="flex gap-1">
-            <Button variant={"ghost"} size={"icon"} className="size-6" title="Сплановано" onClick={(e) => { e.stopPropagation(); console.log("Сплановано") }}>
+            <Button variant={"ghost"} size={"icon"} className="size-6" title="Сплановано" onClick={(e) => { e.stopPropagation();}}>
               <AlertCircle className={cn("size-4", task.status !== TaskStatus.TO_DO && "text-green-500")} />
               <span className="sr-only">Сплановано</span>
             </Button>
 
             {task.status !== TaskStatus.TO_DO && (
-              <Button variant={"ghost"} size={"icon"} className="size-6" title="Зроблено" onClick={(e) => { e.stopPropagation(); console.log("Зроблено") }}>
+              <Button variant={"ghost"} size={"icon"} className="size-6" title="Зроблено" onClick={(e) => { e.stopPropagation();}}>
                 <Clock className={cn("size-4", task.status !== TaskStatus.IN_PROGRESS && "text-green-500")} />
                 <span className="sr-only">Зроблено</span>
               </Button>
             )}
 
             {task.status !== TaskStatus.TO_DO && task.status !== TaskStatus.IN_PROGRESS && (
-              <Button variant={"ghost"} size={"icon"} className="size-6" title="Перевірено" onClick={(e) => { e.stopPropagation(); console.log("Перевірено") }}>
+              <Button variant={"ghost"} size={"icon"} className="size-6" title="Перевірено" onClick={(e) => { e.stopPropagation();}}>
                 <PlusCircle className={cn("size-4", task.status !== TaskStatus.REVIEW && "text-green-500")} />
                 <span className="sr-only">Перевірено</span>
               </Button>
             )}
 
             {task.status === TaskStatus.DONE && (
-              <Button variant={"ghost"} size={"icon"} className="size-6" title="Виконано" onClick={(e) => { e.stopPropagation(); console.log("Виконано") }}>
+              <Button variant={"ghost"} size={"icon"} className="size-6" title="Виконано" onClick={(e) => { e.stopPropagation();}}>
                 <CheckCircle className={cn("size-4 text-green-500")} />
                 <span className="sr-only">Виконано</span>
               </Button>

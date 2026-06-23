@@ -23,6 +23,7 @@ api.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
             window.dispatchEvent(new Event('force-logout'));
         }
         return Promise.reject(error);
