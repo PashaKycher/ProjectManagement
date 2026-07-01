@@ -3,6 +3,7 @@ import Workspace from "../models/workspace.js";
 import Task from "../models/taks.js";
 import { recordActivity } from "../libs/index.js";
 import ActivityLog from "../models/activity.js";
+import Comment from "../models/comment.js";
 
 export const createTask = async (req, res) => {
   try {
@@ -81,7 +82,7 @@ export const updateTaskTitle = async (req, res) => {
     task.title = title;
     await task.save();
 
-    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `Змінено назву з ${oldTitle} на ${title}` });
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `змінив назву з ${oldTitle} на ${title}` });
 
     return res.status(200).json(task);
   } catch (error) {
@@ -114,7 +115,7 @@ export const updateTaskStatus = async (req, res) => {
     task.status = status;
     await task.save();
 
-    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `Змінено статус з ${oldStatus} на ${status}` });
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `змінив статус з ${oldStatus} на ${status}` });
 
     return res.status(200).json(task);
   } catch (error) {
@@ -148,7 +149,7 @@ export const updateTaskDescription = async (req, res) => {
     task.description = description;
     await task.save();
 
-    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `Змінено опис з ${oldDescription} на ${newDescription}` });
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `змінив опис з ${oldDescription} на ${newDescription}` });
 
     return res.status(200).json(task);
   } catch (error) {
@@ -181,7 +182,7 @@ export const updateTaskAssignees = async (req, res) => {
     task.assignees = assignees;
     await task.save();
 
-    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `Змінено учасників з ${oldAssignees.length} на ${assignees.length}` });
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `змінив кількість учасників з ${oldAssignees.length} на ${assignees.length}` });
 
     return res.status(200).json(task);
   } catch (error) {
@@ -214,7 +215,7 @@ export const updateTaskPriority = async (req, res) => {
     task.priority = priority;
     await task.save();
 
-    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `Змінено пріоритет з ${oldPriority} на ${priority}` });
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `змінив пріоритет з ${oldPriority} на ${priority}` });
 
     return res.status(200).json(task);
   } catch (error) {
@@ -247,7 +248,7 @@ export const createSubTask = async (req, res) => {
     task.subtasks.push(newSubTask);
     await task.save();
 
-    await recordActivity(req.user._id, "created_subtask", "Task", taskId, { description: `${req.user.name} додав підзавдання ${title}` });
+    await recordActivity(req.user._id, "created_subtask", "Task", taskId, { description: `додав підзавдання ${title}` });
 
     return res.status(200).json(task);
   } catch (error) {
@@ -284,7 +285,7 @@ export const updateSubTask = async (req, res) => {
     subTask.completed = completed;
     await task.save();
 
-    await recordActivity(req.user._id, "updated_subtask", "Task", taskId, { description: `${req.user.name} оновив підзавдання ${subTask.title}` });
+    await recordActivity(req.user._id, "updated_subtask", "Task", taskId, { description: `оновив підзавдання ${subTask.title}` });
 
     return res.status(200).json(task);
   } catch (error) {
@@ -296,11 +297,126 @@ export const updateSubTask = async (req, res) => {
 export const getTaskActivity = async (req, res) => {
   try {
     const { resourceId } = req.params;
-console.log(resourceId);
+    console.log(resourceId);
     const activity = await ActivityLog.find({ resourceId }).populate("userId", "name profilePicture").sort({ createdAt: -1 }).limit(5);
     return res.status(200).json(activity);
   } catch (error) {
     console.error("task-controller - getTaskActivity:", error);
     return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у getTaskActivity", });
+  }
+}
+
+export const getCommentsByTaskId = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    const comments = await Comment.find({ task: taskId }).populate("author", "name profilePicture");
+
+    return res.status(200).json(comments);
+  } catch (error) {
+    console.error("task-controller - getCommentsByTaskId:", error);
+    return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у getCommentsByTaskId", });
+  }
+}
+
+export const addComment = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { text } = req.body;
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ success: false, error: true, message: "Завдання не знайдено", });
+    }
+
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(404).json({ success: false, error: true, message: "Проект не знайдено", });
+    }
+
+    const isMember = project.members.some((member) => member.user.toString() === req.user._id.toString());
+    if (!isMember) {
+      return res.status(403).json({ success: false, error: true, message: "Ви не маєте доступу до цього робочого проекту", });
+    }
+
+    const newComment = await Comment.create({ text, author: req.user._id, task: taskId });
+    task.comments.push(newComment._id);
+    await task.save();
+
+    await recordActivity(req.user._id, "added_comment", "Task", taskId, { description: `додав коментар ${text.substring(0, 50) + (text.length > 50 ? "..." : "")}` });
+
+    return res.status(201).json(newComment);
+  } catch (error) {
+    console.error("task-controller - addComment:", error);
+    return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у addComment", });
+  }
+}
+
+export const watchTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ success: false, error: true, message: "Завдання не знайдено", });
+    }
+
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(404).json({ success: false, error: true, message: "Проект не знайдено", });
+    }
+
+    const isMember = project.members.some((member) => member.user.toString() === req.user._id.toString());
+    if (!isMember) {
+      return res.status(403).json({ success: false, error: true, message: "Ви не маєте доступу до цього робочого проекту", });
+    }
+
+    const isWatcher = task.watchers.includes(req.user._id);
+    if (!isWatcher) {
+      task.watchers.push(req.user._id);
+    } else {
+      task.watchers = task.watchers.filter((watcher) => watcher.toString() !== req.user._id.toString())
+    }
+
+    await task.save();
+
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `${isWatcher ? "більше не спостерігає за завданням" : "почав спостерігати за завдання"}` });
+
+    return res.status(200).json(task);
+  } catch (error) {
+    console.error("task-controller - watchTask:", error);
+    return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у watchTask", });
+  }
+}
+
+export const achievedTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ success: false, error: true, message: "Завдання не знайдено", });
+    }
+
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(404).json({ success: false, error: true, message: "Проект не знайдено", });
+    }
+
+    const isMember = project.members.some((member) => member.user.toString() === req.user._id.toString());
+    if (!isMember) {
+      return res.status(403).json({ success: false, error: true, message: "Ви не маєте доступу до цього робочого проекту", });
+    }
+
+    const archived = task.isArchived
+    task.isArchived = !archived;
+    await task.save();
+
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, { description: `${archived ? "розархівував завдання" : "додав завдання до архіву"}` });
+
+    return res.status(200).json(task);
+  } catch (error) {
+    console.error("task-controller - achievedTask:", error);
+    return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у achievedTask", });
   }
 }

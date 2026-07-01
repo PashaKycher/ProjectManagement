@@ -1,5 +1,6 @@
 import { BackButton } from '@/components/back-button';
 import { Loader } from '@/components/Loader';
+import CommentSection from '@/components/task/comment-section';
 import Subtasks from '@/components/task/sub-tasks';
 import TaskActivity from '@/components/task/task-activity';
 import TaskAssigneesSelector from '@/components/task/task-assignees-selektor';
@@ -10,7 +11,7 @@ import TaskTitle from '@/components/task/task-title';
 import Watchers from '@/components/task/watchers';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useTaskByIdQuery } from '@/hooks/use-task';
+import { useAchievedTaskMutation, useTaskByIdQuery, useWatchMutation } from '@/hooks/use-task';
 import { priorityTranslation } from '@/lib';
 import { useAuth } from '@/provider/auth-context';
 import type { Project, Task } from '@/types';
@@ -19,15 +20,16 @@ import { uk } from "date-fns/locale"
 import { Eye, EyeOff, LucideDelete } from 'lucide-react';
 import React from 'react'
 import { useNavigate, useParams } from 'react-router';
+import { toast } from 'sonner';
+
 
 const TaskDitails = () => {
   const { user } = useAuth();
   const { taskId, projectId, workspaceId } = useParams<{ taskId: string, projectId: string, workspaceId: string }>();
   const navigate = useNavigate();
-  const { data, isLoading } = useTaskByIdQuery(taskId!) as {
-    data: { task: Task, project: Project };
-    isLoading: boolean
-  };
+  const { mutate: watchTask, isPending: isWatching } = useWatchMutation();
+  const { mutate: achievedTask, isPending: isArchiving } = useAchievedTaskMutation();
+  const { data, isLoading } = useTaskByIdQuery(taskId!) as { data: { task: Task, project: Project }; isLoading: boolean };
 
   if (isLoading || !data) return <Loader />
 
@@ -47,6 +49,24 @@ const TaskDitails = () => {
 
   const members = task?.assignees || []
 
+  const hendleWatchTask = () => {
+    watchTask({ taskId: task._id },
+      {
+        onSuccess: () => { toast.success("Операція успішно виконана"); },
+        onError: (error: any) => toast.error(error?.response?.data?.message || "Щось пішло не так. Спробуйте ще раз.")
+      }
+    )
+  }
+
+  const hendleArchiveTask = () => {
+    achievedTask({ taskId: task._id },
+      {
+        onSuccess: () => { toast.success("Операція успішно виконана") },
+        onError: (error: any) => toast.error(error?.response?.data?.message || "Щось пішло не так. Спробуйте ще раз.")
+      }
+    )
+  }
+
   return (
     <div className='container mx-auto p-0 py-4 md:px-4'>
       <div className='flex flex-col md:flex-row items-center justify-between mb-6'>
@@ -56,16 +76,16 @@ const TaskDitails = () => {
           <h1 className='text-xl md:text-2xl font-bold'>{task.title}</h1>
 
           {task.isArchived && (
-            <Badge className="ml-2" variant={"outline"}>В Архіві</Badge>
+            <Badge className="ml-2 bg-red-600 text-neutral-50" variant={"outline"}>В Архіві</Badge>
           )}
         </div>
 
         <div className='flex space-x-2 mt-4 md:mt-0'>
-          <Button variant={isUserWatching ? 'outline' : 'default'} size="sm" onClick={() => { }} className='w-fit'>
+          <Button variant={isUserWatching ? 'outline' : 'default'} size="sm" onClick={hendleWatchTask} className='w-fit' disabled={isWatching}>
             {isUserWatching ? <><EyeOff className="mr-2 size-4" />Відписатися</> : <><Eye className="mr-2 size-4" />Підписатися</>}
           </Button>
 
-          <Button variant={task.isArchived ? 'outline' : 'default'} size="sm" onClick={() => { }} className='w-fit'>
+          <Button variant={task.isArchived ? 'outline' : 'default'} size="sm" onClick={hendleArchiveTask} className='w-fit' disabled={isArchiving}>
             {task.isArchived ? "Розархівувати" : "Архівувати"}
           </Button>
         </div>
@@ -108,6 +128,8 @@ const TaskDitails = () => {
 
             <Subtasks subTasks={task.subtasks || []} taskId={task._id} />
           </div>
+
+          <CommentSection taskId={task._id} members={project.members as any} />
         </div>
 
         <div className='w-full lg:w-1/4'>

@@ -7,7 +7,7 @@ export const useCreateTaskMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: {projectId: string; taskData: CreateTaskFormData }) => postData(`/tasks/${data.projectId}/create-task`, data.taskData),
+    mutationFn: (data: { projectId: string; taskData: CreateTaskFormData }) => postData(`/tasks/${data.projectId}/create-task`, data.taskData),
     onSuccess: (data: any) => { queryClient.invalidateQueries({ queryKey: ["project", data.project] }); }
   });
 };
@@ -28,7 +28,7 @@ export const useUpdateTaskTitleMutation = () => {
   })
 }
 
-export const useUpdateTaskStatusMutation = () =>{
+export const useUpdateTaskStatusMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -78,6 +78,39 @@ export const useUpdateSubTaskMutation = () => {
 
   return useMutation({
     mutationFn: (data: { taskId: string; subTaskId: string; completed: boolean }) => updateData(`/tasks/${data.taskId}/update-subtask/${data.subTaskId}`, { completed: data.completed }),
+    onSuccess: (data: any) => { queryClient.invalidateQueries({ queryKey: ["task", data._id] }); queryClient.invalidateQueries({ queryKey: ["task-activity", data._id] }); }
+  })
+}
+
+export const useAddCommentMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string; text: string }) => postData(`/tasks/${data.taskId}/add-comment`, { text: data.text }),
+    onSuccess: (data: any) => { queryClient.invalidateQueries({ queryKey: ["comments", data.task] }); queryClient.invalidateQueries({ queryKey: ["task-activity", data.task] }); }
+  })
+}
+
+export const useGetCommentsByTaskIdQuery = (taskId: string) => {
+  return useQuery({
+    queryKey: ["comments", taskId],
+    queryFn: async () => fetchData(`/tasks/${taskId}/comments`),
+  });
+}
+
+export const useWatchMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string }) => postData(`/tasks/${data.taskId}/watch`, {}),
+    onSuccess: (data: any) => { queryClient.invalidateQueries({ queryKey: ["task", data._id] }); queryClient.invalidateQueries({ queryKey: ["task-activity", data._id] }); }
+  })
+}
+
+export const useAchievedTaskMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { taskId: string }) => postData(`/tasks/${data.taskId}/achieved`, {}),
     onSuccess: (data: any) => { queryClient.invalidateQueries({ queryKey: ["task", data._id] }); queryClient.invalidateQueries({ queryKey: ["task-activity", data._id] }); }
   })
 }

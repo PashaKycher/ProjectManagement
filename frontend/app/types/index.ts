@@ -153,3 +153,23 @@ export interface ActivityLog {
   details: any;
   createdAt: Date;
 }
+
+export interface CommentReaction {
+  user: User;
+  emoji: string;
+  createdAt: Date;
+}
+
+export interface Comment {
+  _id: string;
+  text: string;
+  author: User;
+  createdAt: Date;
+  reactions?: CommentReaction[];
+  attachments?: {
+    fileName: string;
+    fileUrl: string;
+    fileType: string;
+    fileSize: number;
+  }[];
+}

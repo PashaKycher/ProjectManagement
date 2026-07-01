@@ -67,3 +67,7 @@ export const getWorkspaceByIdProjects = async (req, res) => {
         return res.status(500).json({ success: false, error: true, message: "Щось пішло не так у getWorkspaceByIdProjects", });
     }
 }
+
+export const getWorkspaceStats = async (req, res) => {
+  
+}
